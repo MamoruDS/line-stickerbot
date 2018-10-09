@@ -6,7 +6,7 @@ import urllib.parse
 import requests
 import cssutils
 from bs4 import BeautifulSoup
-from wand.image import Image
+from PIL import Image
 from zipfile import ZipFile
 from OpenSSL import SSL
 import os
@@ -37,19 +37,15 @@ def dl_stickers(page):
         imageurl = imageurl['background-image']
         imageurl = imageurl.replace('url(', '').replace(')', '')
         imageurl = imageurl[1:-15]
-        response = urllib.request.urlopen(imageurl)
+        response = urllib.request.urlretrieve(imageurl)
         resize_sticker(response, imageurl)
 
 def resize_sticker(image, filename):
-    filen = filename[-7:]
-    with Image(file=image) as img:
-        ratio = 1
-        if img.width > img.height:
-            ratio = 512.0/img.width
-        else:
-            ratio = 512.0/img.height
-        img.resize(int(img.width*ratio), int(img.height*ratio), 'mitchell')
-        img.save(filename=("downloads/" + filen))
+    edge = image.height if image.height > image.width else image.width
+    img = Image.new('RGBA', (edge,edge), color=0)
+    img.paste(image, (0,edge-image.height))
+    img = img.resize((512,512), Image.LANCZOS)
+    img.save('./downloads/' + filename)
 
 def send_stickers(page):
     dl_stickers(page)
