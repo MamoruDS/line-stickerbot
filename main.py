@@ -15,8 +15,14 @@ cssutils.log.setLevel(logging.CRITICAL)
 
 
 # This will mark the last update we've checked
-with open('updatefile', 'r') as f:
-    last_update = int(f.readline().strip())
+try:
+    f = open('updatefile', 'r')
+    try:
+        last_update = int(f.readline().strip())
+    finally:
+        f.close()
+except IOError:
+    last_update = 0
 # Here, insert the token BotFather gave you for your bot.
 TOKEN = '<token>'
 # This is the url for communicating with your bot
@@ -29,16 +35,22 @@ LINE_URL = "https://store.line.me/stickershop/product/"
 WRONG_URL_TEXT = ("That doesn't appear to be a valid URL. "
                   "To start, send me a URL that starts with " + LINE_URL)
 
+if not os.path.exists(os.curdir + '/downloads'):
+    os.mkdir('downloads')
+
 def dl_stickers(page):
     images = page.find_all('span', attrs={"style": not ""})
+    sticker_index = 1
     for i in images:
         imageurl = i['style']
         imageurl = cssutils.parseStyle(imageurl)
         imageurl = imageurl['background-image']
         imageurl = imageurl.replace('url(', '').replace(')', '')
         imageurl = imageurl[1:-15]
-        response = urllib.request.urlretrieve(imageurl)
-        resize_sticker(response, imageurl)
+        filen = str(last_update) + '_' + str(sticker_index) + '.png'
+        urllib.request.urlretrieve(imageurl, './downloads/' + filen)
+        resize_sticker(Image.open('./downloads/'+filen), filen)
+        sticker_index = sticker_index + 1
 
 def resize_sticker(image, filename):
     edge = image.height if image.height > image.width else image.width
@@ -46,6 +58,11 @@ def resize_sticker(image, filename):
     img.paste(image, (0,edge-image.height))
     img = img.resize((512,512), Image.LANCZOS)
     img.save('./downloads/' + filename)
+    requests.post(URL + 'sendDocument', params=dict(
+        chat_id = update['message']['chat']['id']
+    ), files=dict(
+        document = open('./downloads/' + filename, 'rb')
+    ))
 
 def send_stickers(page):
     dl_stickers(page)
