@@ -76,7 +76,7 @@ def send_stickers(page):
     ), files=dict(
         document = open('stickers.zip', 'rb')
     ))
-    print("snet;)")
+    print("sent;)")
 
 
 # We want to keep checking for updates. So this must be a never ending loop
