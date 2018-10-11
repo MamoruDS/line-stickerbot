@@ -4,18 +4,16 @@ A Telegram bot for downloading Line stickers. It takes a URL sent to the bot fro
 
 ## Getting Started
 Create your sticker fetch bot via [@BotFather](https://t.me/BotFather) on Telegram.  
-Install the requirement package via pip
-```shell
-pip install -r requirements.txt
-```
 Replace `<token>` in `main.py` with the token the `BotFather` gave you, and run `main.py`.  
 Send a line sticker shop link to your bot then you will receive stickers with file format.  
 After bot fetched all sticker, it will send you a zip arhcive contian all stickers.
 
 ## Dependencies
 
-This bot uses a few modules to make my life easier. Run `pip install` if you don't have them.
-
+This bot uses a few modules to make my life easier. Run this command if you don't have them.
+```shell
+pip install -r requirements.txt
+```
 * `bs4` for parsing the HTML of the sticker page.
 * `cssutils` for getting the url of the sticker image.
 * `pillow` for resizing the downloaded images.
